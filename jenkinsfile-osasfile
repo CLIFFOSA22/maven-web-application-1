@@ -1,0 +1,19 @@
+node{
+    def mavenHome = tool name: 'maven3.9.2'
+    stage('1CloneCode'){git "https://github.com/CLIFFOSA22/maven-web-application-1"}
+    stage('2Test&Build'){
+        sh "${mavenHome}/bin/mvn clean package"
+    }
+ stage('3codeQuality'){sh "${mavenHome}/bin/mvn sonar:sonar"}
+  //stage('4uploadArtifacts'){sh "${mavenHome}/bin/mvn deploy"
+  http://18.223.156.186:1980/devops/repository/tesla-release/ 
+  http://18.223.156.186:1980/devops/repository/tesla-snapshot/}
+  stage('5deploy2UAT'){sh "echo 'deploy to UAT' "
+ deploy adapters: [tomcat9(credentialsId: 'osas', path: '', url: 'http://3.138.246.169:8080/')], contextPath: null, war: 'target/*war'
+  }
+  stage('6approvalGate'){ sh "echo 'ready for review'"
+      timeout(time:5, unit:'DAYS') {input message: "Ready for deployment, please review and approve. Thank you"}
+  }
+  stage('7deploy2Prod'){deploy adapters: [tomcat9(credentialsId: 'osas', path: '', url: 'http://3.138.246.169:8080/')], contextPath: null, war: 'target/*war'}
+  stage('8emailNotification'){emailext body: 'check build status', recipientProviders: [buildUser(), developers(), upstreamDevelopers(), contributor()], subject: 'build status', to: 'teskla@gmail.com'}
+    }
