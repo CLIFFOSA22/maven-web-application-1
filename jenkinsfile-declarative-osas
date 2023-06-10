@@ -1,0 +1,87 @@
+pipeline{
+
+  agent any
+  tools{ maven "maven3.9.2"}
+  stages{
+
+  stage("1GetCode"){
+  steps{ 
+ 
+ sh "echo 'clone the latest version of the application in Scm'"
+ git branch: 'dev', credentialsId: 'cliffosa22', url: 'https://github.com/CLIFFOSA22/tesla-private-repo'
+
+}
+
+  }
+
+ stage("2Test+Buil"){
+
+steps{
+	
+sh "echo 'running a unit test cases'"
+sh "echo 'code must be passed before creating artifact'"
+sh "mvn clean package"
+}
+ }
+
+stage("3CodeQuality"){
+	
+steps{
+
+sh "echo 'running code quality analysis'"
+
+sh "mvn sonar:sonar"
+
+}
+
+}
+
+stage("4UploadArtifact2Nexus"){
+	
+steps{
+
+sh "echo 'uploading artifact to nexus'"	
+
+sh "mvn deploy"
+
+}
+}
+
+stage("5DeployArtifact2Prod"){
+	
+steps{
+
+sh "echo 'deploying artifact to production'"	
+
+deploy adapters: [tomcat9(credentialsId: 'osas', path: '', url: 'http://3.15.159.165:8080/')], contextPath: null, war: 'target/*war'
+	
+
+}
+}
+}
+  post{
+
+always{
+	
+emailext body: '''Hey, check build status. Thank you
+Landmark Technology
++4163127624''', subject: 'always', to: 'cliffeg1@gmail.com'
+
+}
+
+  success{
+
+  emailext body: '''Hey, build and deploy was carried out successfully. Thank you guys
+Landmark Technology
++4163127624''', subject: 'successful', to: 'cliffeg1@gmail.com'
+
+  }
+    
+failure{
+	
+emailext body: '''Hey, build and deploy was not successfully. Please resolve issue
+Landmark Technology
++4163127624''', subject: 'failure', to: 'cliffeg1@gmail.com'
+}
+}
+}
