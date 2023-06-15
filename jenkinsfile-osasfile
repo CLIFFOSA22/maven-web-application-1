@@ -5,9 +5,7 @@ node{
         sh "${mavenHome}/bin/mvn clean package"
     }
  stage('3codeQuality'){sh "${mavenHome}/bin/mvn sonar:sonar"}
-  //stage('4uploadArtifacts'){sh "${mavenHome}/bin/mvn deploy"
-  http://18.223.156.186:1980/devops/repository/tesla-release/ 
-  http://18.223.156.186:1980/devops/repository/tesla-snapshot/}
+  stage('4uploadArtifacts'){sh "${mavenHome}/bin/mvn deploy"}
   stage('5deploy2UAT'){sh "echo 'deploy to UAT' "
  deploy adapters: [tomcat9(credentialsId: 'osas', path: '', url: 'http://3.138.246.169:8080/')], contextPath: null, war: 'target/*war'
   }
