@@ -103,7 +103,7 @@
 	    <snapshotRepository>
 	      <id>nexus</id>
 	      <name>Landmark Technologies Snapshot Nexus Repository </name>
-	      <url>http://3.96.178.164:3000/repository/app-snapshot/</url>
+	      <url>http://3.96.178.164:3000/repository/app-kim-snapshot/</url>
 	    </snapshotRepository>
 	    
 	</distributionManagement>
