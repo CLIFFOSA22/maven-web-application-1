@@ -1,0 +1,69 @@
+pipeline{
+agent any
+tools{maven "maven"}
+stages{
+stage('1cloneclode'){
+
+
+steps{
+	sh "echo 'clone code from github'"
+	git 'https://github.com/CLIFFOSA22/maven-web-application-1'
+]
+}
+
+stage('2test and build'){
+	steps{
+    sh "echo 'creating artifacts in the target directory'"
+    sh "echo 'make sure that the unit testing is passed before build'"
+    sh "mvn clean package"
+    }
+
+    }
+stage('3codequality analysis'){
+    steps{
+    sh "echo 'run code quality analysis on the application'"
+	sh "mvn sonar:sonar"
+    }
+	}
+stage('4deploy to Nexus'){
+	steps{
+	sh "echo 'deploy artifacts to be backup in nexus'"
+	sh "mvn deploy"
+	}
+}
+stage('5build docker image'){
+   steps{
+   sh "echo 'build docker image from dockerfile in your project file'"
+   sh "docker build -t app1 ."
+   // cliffosa-app is the directory where my Dockerfile is located in my Jenkins GUI
+   }
+}
+
+stage('6deploy docker image'){
+   steps{
+   sh "echo 'deploy docker image to docker registry'"
+   sh "docker push osasdevops/tes"
+   }
+}
+stage('7undeploy the application'){
+	steps{
+	sh "echo 'pull image from docker registry and deploy application as a docker container'"
+	sh "docker rm -f tesla-app1"
+	}
+}
+stage('8deploy application'){
+	steps{
+	sh "echo 'deploy the application as a docker application'"
+		sh "docker run --name tesla-app1 -d -p 12:8080 osasdevops/tes"
+
+	}
+}
+stage('email notification'){
+	steps{
+	sh "echo 'application deployed successfully'"
+	
+}
+
+}
+}
+}
